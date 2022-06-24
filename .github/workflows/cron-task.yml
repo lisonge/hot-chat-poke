@@ -1,0 +1,34 @@
+name: corn-task
+on:
+  # schedule:
+  #   - cron: '45 1 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      ANY:
+        description: 'ANY'
+        default: 'ANY'
+        required: false
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{secrets.DATABASE_URL}}
+      API_BASE_URL: ${{secrets.API_BASE_URL}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version: 14.x
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.1
+        with:
+          version: 6
+
+      - run: pnpm install --registry=https://registry.npmmirror.com/
+
+      - run: pnpm start

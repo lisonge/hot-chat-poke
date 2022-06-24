@@ -1,0 +1,35 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["referentialIntegrity"]
+    binaryTargets   = ["native", "linux-musl", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+    url                  = env("DATABASE_URL")
+    provider             = "mysql"
+    referentialIntegrity = "prisma"
+}
+
+model User {
+    id           Int     @id @default(autoincrement())
+    hotChatId    BigInt  @unique
+    hotChatToken String?
+    name         String?
+    pokedByList  Pokes[] @relation("poker")
+    pokingList   Pokes[] @relation("poking")
+}
+
+model Pokes {
+    poker    User   @relation("poker", fields: [pokerId], references: [hotChatId])
+    pokerId  BigInt
+    poking   User   @relation("poking", fields: [pokingId], references: [hotChatId])
+    pokingId BigInt
+
+    @@id([pokerId, pokingId])
+}
+
+// 数据可任意修改, 保持数据库活跃状态
+model Cache {
+    id   Int     @id @default(autoincrement())
+    note String?
+}
